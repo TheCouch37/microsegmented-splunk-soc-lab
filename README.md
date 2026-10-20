@@ -26,22 +26,22 @@ The environment consists of three isolated virtual machines operating on an inte
 flowchart LR
     subgraph Internal_Subnet ["Internal Subnet (192.168.10.0/24)"]
         direction LR
-        Attacker["🔴 Attacker VM (Kali)\n192.168.10.12\nTools: Nmap, Hydra"]
-        Web["🟡 Web-Server VM\n192.168.10.10\nAuthorized Peer"]
+        Attacker["🔴 Attacker VM (Kali)<br/>192.168.10.12<br/>Tools: Nmap, Hydra"]
+        Web["🟡 Web-Server VM<br/>192.168.10.10<br/>Authorized Peer"]
         
         subgraph Microsegmented_Zone ["🔒 Micro-Segmented Workload"]
-            DB["🟢 DB-Server VM\n192.168.10.11\niptables Host Firewall\nSplunk Universal Forwarder"]
+            DB["🟢 DB-Server VM<br/>192.168.10.11<br/>iptables Host Firewall<br/>Splunk Universal Forwarder"]
         end
     end
 
     subgraph SIEM_Tier ["SOC Monitoring Tier"]
-        Splunk["🟣 Splunk Enterprise SIEM\nIndexer & Search Head\nPort: 9997 / 8000"]
+        Splunk["🟣 Splunk Enterprise SIEM<br/>Indexer & Search Head<br/>Port: 9997 / 8000"]
     end
 
-    Attacker -- "1. Horizontal Port Scan (Nmap)\n[BLOCKED & LOGGED]" --> DB
-    Attacker -- "2. SSH Credential Spray (Hydra)\n[LOGGED TO AUTH.LOG]" --> DB
-    Web -- "Permitted DB Traffic\n[ALLOWED]" --> DB
-    DB === "Telemetry Stream (TCP/9997)\n/var/log/kern.log\n/var/log/auth.log" ==> Splunk
+    Attacker -->|"1. Horizontal Port Scan (Nmap)<br/>[BLOCKED & LOGGED]"| DB
+    Attacker -->|"2. SSH Credential Spray (Hydra)<br/>[LOGGED TO AUTH.LOG]"| DB
+    Web -->|"Permitted DB Traffic<br/>[ALLOWED]"| DB
+    DB ==>|"Telemetry Stream (TCP/9997)<br/>/var/log/kern.log<br/>/var/log/auth.log"| Splunk
 ```
 
 ### Component Breakdown
