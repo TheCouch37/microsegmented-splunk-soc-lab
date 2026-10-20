@@ -100,8 +100,17 @@ hydra -L users.txt -P passwords.txt ssh://192.168.10.11
 
 ## Phase 4: Detection Engineering & SPL Queries (Blue Team)
 
-### 1. Visualizing Network-Layer Port Scans
-Extracts the destination port (`DPT`) from `iptables` kernel drop logs to identify the flat distribution signature of an automated port scan across targeted ports:
+### 1. Investigating & Visualizing Network-Layer Port Scans
+First, raw `FIREWALL_DROP` kernel events were aggregated by source IP (`SRC`), destination IP (`DST`), and destination port (`DPT`) to verify the scope of the lateral scan across 438 blocked packets:
+```spl
+FIREWALL_DROP 
+| stats count by SRC, DST, DPT
+```
+
+![SPL Firewall Drop Statistics](assets/spl-firewall-stats.png)
+*Figure 2: Statistical breakdown of blocked Nmap probe packets originating from `192.168.10.12` targeting `192.168.10.11` across sequential destination ports.*
+
+Next, the telemetry was transformed into a column chart by destination port (`DPT`) on the main dashboard to highlight the flat distribution signature typical of an automated port scan:
 ```spl
 FIREWALL_DROP 
 | chart count by DPT
@@ -124,7 +133,7 @@ To eliminate alert fatigue while maintaining immediate visibility into active sc
 * **Severity:** High
 
 ![Triggered Alert Verification](assets/alert-triggered.png)
-*Figure 2: Real-time alert trigger validation inside Splunk Enterprise confirming automated detection of the lateral port scan.*
+*Figure 3: Real-time alert trigger validation inside Splunk Enterprise confirming automated detection of the lateral port scan.*
 
 ---
 
